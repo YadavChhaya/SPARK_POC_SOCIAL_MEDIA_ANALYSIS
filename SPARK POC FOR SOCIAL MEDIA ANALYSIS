@@ -1,0 +1,90 @@
+Spark POC – Social Media Analysis
+======================================
+
+Column 1: User ID
+
+Column 2: User Name
+
+Column 3: Age of the User
+
+Column 4: Number of Friends with that User
+
+Input Dataset:
+--------------
+https://drive.google.com/file/d/0Bxr27gVaXO5sMXc3aXo2WVJQNE0/view
+
+Problem Statement 1:
+----------------------
+Calculate the average number of friends based on their age, on a social media website.
+
+hadoop fs -mkdir -p /user/hadoop/input/
+hadoop fs -put /home/cloudera/Downloads/social_friends.csv /user/hadoop/input/
+spark-shell
+val rdd1 = sc.textFile("hdfs://quickstart.cloudera:8020/user/hadoop/input/social_friends.csv")
+rdd1.count
+val rdd2 = rdd1.map(_.split(","))
+val rdd3 = rdd2.filter{ x => ( x(2).matches("\\d+")  && x(3).matches("\\d+")) }
+val rdd4 = rdd3.map{  x =>  (x(2).toInt,x(3).toInt) }
+val rdd5 = rdd4.mapValues{ x => (x,1) }
+val rdd6 = rdd5.reduceByKey{ (x,y)  => ((x._1 + y._1),(x._2 + y._2)) }
+val rdd7 = rdd6.mapValues{ case( sum, count) =>  sum/count }
+val rdd8 = rdd7.sortByKey()
+rdd8.foreach(println)
+
+Output:
+
+(18,343)
+(19,213)
+(20,165)
+(21,350)
+(22,206)
+(23,246)
+(24,233)
+(25,197)
+(26,242)
+(27,228)
+(28,209)
+(29,215)
+(30,235)
+(31,267)
+(32,207)
+(33,325)
+(34,245)
+(35,211)
+(36,246)
+(37,249)
+(38,193)
+(39,169)
+(40,250)
+(41,268)
+(42,303)
+(43,230)
+(44,282)
+(45,309)
+(46,223)
+(47,233)
+(48,281)
+(49,184)
+(50,254)
+(51,302)
+(52,340)
+(53,222)
+(54,278)
+(55,295)
+(56,306)
+(57,258)
+(58,116)
+(59,220)
+(60,202)
+(61,256)
+(62,220)
+(63,384)
+(64,281)
+(65,298)
+(66,276)
+(67,214)
+(68,269)
+(69,235)
+
+
+
